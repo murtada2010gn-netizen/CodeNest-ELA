@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+    <title>Murtada Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 class="HT1">CodeNest</h1>
+
+        <nav id="nava"  class="navbar navbar-expand-lg">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <a class="nav-link" href="ELA.html">ELA</a>
+                <a class="nav-link" href="about.html">About</a>
+                <a  class="nav-link" href="contact.html">Contact</a>
+                <button id="DarkMode"></a><i class="bi bi-moon-fill"></i></button>
+                
+            </div>
+            </div>
+        </div>
+        </nav>
+    </header>
+    <main>
+        <div>
+            <p class="MT1">Welcome to the Creativity Club, where creative people meet.</p>
+            <img id="MI1" src="logo.png">
+            <h3 class="MT2">Explor ELA Now!</h3>
+            <button id="MB1" class="btn btn-primary" type="button">ELA!</button>
+        </div>
+
+    </main>
+    <footer>
+            <p class="FT1">© 2026 CodeNest. All rights reserved.</p>
+    </footer>
+</body>
+<script>
+    let btn1 = document.querySelector("#MB1")
+    btn1.addEventListener("click", function(){
+        btn1.style.transform = "scale(1.1)";
+        window.location.href = "ELA.html";
+
+    }
+    )
+    let Darkmode = document.querySelector("#DarkMode");
+    let icon = document.querySelector("i");
+    let man = document.querySelector("body");
+    let mt2 = document.querySelector(".MT2")
+    let mt1 = document.querySelector(".MT1")
+
+    Darkmode.addEventListener("click", function () {
+        if (icon.classList.contains("bi-moon-fill")) {
+            man.style.backgroundColor = "black";
+            icon.classList.remove("bi-moon-fill");
+            icon.classList.add("bi-sun-fill");
+            mt2.style.color = "white"
+            mt1.style.color = "white"
+        }
+        else {
+            man.style.backgroundColor = "white";
+            icon.classList.remove("bi-sun-fill");
+            icon.classList.add("bi-moon-fill");
+            mt2.style.color = "black"
+            mt1.style.color = "black"
+        }
+    });
+
+</script>
+</html>
