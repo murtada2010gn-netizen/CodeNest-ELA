@@ -1,45 +1,325 @@
-from flask import Flask, render_template, request
 import json
+from pathlib import Path
+from flask import Flask, render_template, request, send_file, session
+import numpy as np
+import ollama
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import root_mean_squared_error, r2_score
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    r2_score,
+)
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+app = Flask(
+    __name__, template_folder="../frontend", static_folder="../frontend"
+)
+app.secret_key = "1903876473eeel222344pp"
 
-app = Flask(__name__, template_folder="../frontend", static_folder="../frontend")
 
 @app.route("/")
 def index():
-    return render_template("ELA.html")
+  return render_template("ELA.html")
+
 
 @app.route("/train", methods=["POST"])
 def receive_settings():
-    uploaded_file = request.files["file"]
-    uploaded_file.save("data.csv")    
-    settings_text = request.form.get("settings")
-    data = json.loads(settings_text) if settings_text else {}
-    
-    with open("settings.json", "w", encoding="utf-8") as json_file:
-        json.dump(data, json_file, indent=4, ensure_ascii=False)
-    with open("settings.json", "r", encoding="utf-8") as f:
-        settings = json.load(f)
-        selected_feature = settings["fe"]
-        data = pd.read_csv("data.csv")
-        data = data.dropna()
-        data = data.drop_duplicates()
-        x = data[selected_feature]
-        x = x.select_dtypes(include=['number'])
-        selected_target = settings["ta"]
-        y = data[selected_target].loc[x.index]
-        x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2, random_state=42)
-        model = LinearRegression()
-        model.fit(x_train,y_train)
-        pred = model.predict(x_test)
-        print(m1(y_test,pred))
+  uploaded_file = request.files["file"]
+  
 
-    return {"status": "success"}
-def m1(yt,yp):
-    RMSE =  root_mean_squared_error(y_true=yt,y_pred=yp)
-    R2 = r2_score(y_true=yt,y_pred=yp)
-    return RMSE, R2
-    
+  settings_text = request.form.get("settings")
+  settings = json.loads(settings_text) if settings_text else {}
+
+
+  parms = {
+      "model__max_depth": list(np.arange(3, 12, 5)),
+      "model__n_estimators": list(np.arange(50, 201, 100)),
+  }
+  raw_tts = settings.get("TTS", 20)
+  if raw_tts <= 0:
+    raw_tts = 10
+  elif raw_tts >= 100:
+    raw_tts = 90
+
+  test_size = raw_tts / 100.0
+
+  selected_feature = settings.get("fe", [])
+  selected_target = settings.get("ta")
+  data = pd.read_csv(uploaded_file)
+
+  data = data.dropna(subset=[selected_target])
+
+  clean_data = cleaner(data=data, x_data=selected_feature)
+  x = clean_data
+  y = data[selected_target].values
+
+  x_train, x_test, y_train, y_test = train_test_split(
+      x, y, test_size=test_size, random_state=42
+  )
+
+  if settings["model"] == "rfr":
+    pip = Pipeline([("model", RandomForestRegressor(random_state=42))])
+    model = GridSearchCV(
+        estimator=pip, param_grid=parms, scoring="r2", cv=5, n_jobs=-1
+    )
+    model.fit(x_train, y_train)
+    pred = model.predict(x_test)
+    mae, r2 = m1(y_test, pred)
+    response = {"status": "success", "mae": float(mae), "r2": float(r2)}
+  elif settings["model"] == "rfc":
+    pip = Pipeline([
+        (
+            "model",
+            RandomForestClassifier(random_state=42, class_weight="balanced"),
+        )
+    ])
+    model = GridSearchCV(
+        estimator=pip, param_grid=parms, scoring="recall", cv=5, n_jobs=-1
+    )
+    model.fit(x_train, y_train)
+    pred = model.predict(x_test)
+
+    f1, accuracy, confusion_matrx = m2(y_test, pred)
+    response = {
+        "status": "success",
+        "f1": float(f1),
+        "accuracy": float(accuracy),
+        "confusion_matrix": confusion_matrx.tolist(),
+    }
+
+  summuray = {
+      "len_df": len(clean_data),
+      "columns": list(clean_data.columns),
+      "discribtion": clean_data.describe().to_dict(),
+      "sample": clean_data.head(3).to_dict(orient="records"),
+  }
+
+  report = generate_report(
+      settings=settings, metrics=response, summary=summuray
+  )
+
+  Path("settings.json").unlink(missing_ok=True)
+
+  session["alldata"] = {
+      "setting": settings,
+      "test_size": test_size,
+      "metrics": response,
+      "aireport": report,
+  }
+  return response
+
+
+@app.route("/download_report", methods=["GET", "POST"])
+def download_report():
+  if request.method == "GET":
+    return render_template("download_report.html")
+  else:
+    data = session.get("alldata", {})
+    settings = data.get("setting", {})
+    metrics = data.get("metrics", {})
+    report = data.get("aireport", "No AI report available.")
+    test_size = data.get("test_size", 0.2)
+
+    doc = SimpleDocTemplate(
+        "ELA-REPORT.pdf",
+        pagesize=A4,
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30,
+    )
+    story = []
+
+    style = getSampleStyleSheet()
+    Title = style["Title"]
+    Heading2 = style["Heading2"]
+    Normal = style["Normal"]
+
+    story.append(Paragraph("CodeNest - ELA", Title))
+    story.append(Spacer(1, 15))
+    story.append(
+        Paragraph(
+            "Machine Learning Model Analysis Report – Created by ELA Platform",
+            Heading2,
+        )
+    )
+    story.append(Spacer(1, 15))
+
+    if settings.get("model") == "rfr":
+      tab = [
+          ["Metric / Setting", "Value"],
+          ["Model Type", "Random Forest Regressor"],
+          ["Train Test Split", f"{int(test_size * 100)}%"],
+          ["Mean Absolute Error (MAE)", f"{metrics.get('mae', 0):.4f}"],
+          ["R2 Score", f"{metrics.get('r2', 0):.4f}"],
+      ]
+    else:
+      tab = [
+          ["Metric / Setting", "Value"],
+          ["Model Type", "Random Forest Classifier"],
+          ["Train Test Split", f"{int(test_size * 100)}%"],
+          ["Accuracy", f"{metrics.get('accuracy', 0):.2%}"],
+          ["F1 Score", f"{metrics.get('f1', 0):.2%}"],
+      ]
+
+    metrics_table = Table(tab, colWidths=[200, 220])
+    metrics_table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1E3A8A")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+            ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F8FAFC")),
+            ("PADDING", (0, 0), (-1, -1), 6),
+        ])
+    )
+
+    story.append(metrics_table)
+    story.append(Spacer(1, 25))
+    story.append(Paragraph("AI Audit Report:", style["Heading3"]))
+    story.append(Spacer(1, 10))
+
+    for line in report.split("\n"):
+      if line.strip():
+        story.append(Paragraph(line, Normal))
+        story.append(Spacer(1, 6))
+
+    doc.build(story)
+    return send_file("ELA-REPORT.pdf", as_attachment=True)
+
+
+def m1(yt, yp):
+  mae = mean_absolute_error(y_true=yt, y_pred=yp)
+  r2 = r2_score(y_true=yt, y_pred=yp)
+  return mae, r2
+
+
+def m2(yt, yp):
+  f1 = f1_score(y_true=yt, y_pred=yp, average="weighted")
+  accuracy = accuracy_score(y_true=yt, y_pred=yp)
+  confusion_matrx = confusion_matrix(y_true=yt, y_pred=yp)
+  return f1, accuracy, confusion_matrx
+
+
+def generate_report(settings, metrics, summary):
+  system_prompt = """
+    You are an expert Machine Learning Auditor and Performance Analyst.
+
+    YOUR TASKS:
+    1. Complete Performance Analysis: Evaluate whether the model performs well or poorly based on the metrics and confusion matrix. Explain what the numbers mean (e.g., balance between precision and recall, impact of accuracy/F1 score).
+    2. User Configuration Audit: Check for user setup errors, such as:
+       - Target vs. Model Mismatch (e.g., regressor for classification).
+       - Data Leakage or irrelevant features (e.g., IDs, names).
+       - Invalid Data Split (TTS < 10% or > 40%).
+       - Inconsistencies between matrix and reported metrics.
+
+    STRICT BOUNDARIES (CRITICAL):
+    - DO NOT provide general recommendations, suggestions, or advice on how the user should improve or edit their model/features (e.g., DO NOT suggest feature engineering, hyperparameter tuning, or data resampling).
+    - Stick ONLY to analyzing the current performance and pointing out configuration errors (if any).
+
+    STRICT FORMATTING RULES:
+    - Output strictly PLAIN TEXT only.
+    - ABSOLUTELY NO Markdown (no **, #, *, _, ~, or bullet symbols).
+    - NO LaTeX or dollar signs ($).
+    - Write in clean, structured standard paragraphs using plain text.
+    - NEVER use double asterisks (**) for headings or bolding. Use CAPITAL LETTERS for section names instead.
+    """
+
+  user_prompt = f"Settings: {settings}\nMetrics: {metrics}\nSummary: {summary}"
+
+  response = ollama.chat(
+      model="qwen3:8b",
+      messages=[
+          {"role": "system", "content": system_prompt},
+          {"role": "user", "content": user_prompt},
+      ],
+      options={"temperature": 0.1},
+  )
+  return response["message"]["content"]
+
+
+def cleaner(data, x_data):
+  x = data[x_data].copy()
+
+  binary_column = []
+  multi_int_cat_col = []
+  int_column = []
+  float_column = []
+  cat_colums = []
+  binary_str_column = []
+
+  for i in x.columns:
+    is_text = pd.api.types.is_object_dtype(
+        x[i]
+    ) or pd.api.types.is_string_dtype(x[i])
+
+    if pd.api.types.is_numeric_dtype(x[i]):
+      diffs = x[i].diff().dropna()
+      if len(diffs) > 0 and (diffs == 1).all():
+        continue
+
+    if set(x[i].dropna().unique()) <= {0, 1}:
+      binary_column.append(i)
+    elif pd.api.types.is_integer_dtype(x[i]):
+      if x[i].nunique() <= 15:
+        multi_int_cat_col.append(i)
+      else:
+        int_column.append(i)
+    elif is_text and len(x[i].dropna().unique()) <= 2:
+      binary_str_column.append(i)
+    elif pd.api.types.is_float_dtype(x[i]):
+      float_column.append(i)
+    elif is_text and len(x[i].dropna().unique()) <= 15:
+      cat_colums.append(i)
+
+  numeric_cols = int_column + float_column
+  categorical_cols = cat_colums + multi_int_cat_col
+
+  numpip = Pipeline([
+      ("imputer", SimpleImputer(strategy="median")),
+      ("scaler", StandardScaler()),
+  ])
+
+  bpip = Pipeline([
+      ("imputer", SimpleImputer(strategy="most_frequent")),
+      ("scaler", StandardScaler()),
+  ])
+
+  catpip = Pipeline([
+      ("imputer", SimpleImputer(strategy="most_frequent")),
+      ("encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+  ])
+
+  bin_strpip = Pipeline([
+      ("imputer", SimpleImputer(strategy="most_frequent")),
+      ("encoding", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+  ])
+
+  processor = ColumnTransformer(
+      transformers=[
+          ("num", numpip, numeric_cols),
+          ("bin", bpip, binary_column),
+          ("cat", catpip, categorical_cols),
+          ("binstr", bin_strpip, binary_str_column),
+      ]
+  )
+
+  cleaned_arr = processor.fit_transform(x)
+  NewColumnsName = processor.get_feature_names_out()
+  AllCleanedData = pd.DataFrame(cleaned_arr, columns=NewColumnsName)
+  return AllCleanedData
+
+
+if __name__ == "__main__":
+  app.run(debug=True)

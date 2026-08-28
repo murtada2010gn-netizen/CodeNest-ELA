@@ -1,5 +1,9 @@
 Flask
 pandas
+numpy
+pathlib
 json
 scikit-learn
 gunicorn
+reportlab
+ollama
