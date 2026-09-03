@@ -231,6 +231,9 @@ footer {
 .ela-page:has(#DarkMode .bi-sun-fill) { --ela-bg: #121212; --ela-surface: #1e1e1e; --ela-elevated: #20242d; --ela-border: #313947; --ela-text: #f5f7fb; --ela-secondary: #b7c0d0; --ela-muted: #8d98aa; --ela-accent-soft: #252743; }
 .ela-page:has(#DarkMode .bi-sun-fill) .ela-workflow li,.ela-page:has(#DarkMode .bi-sun-fill) .ela-control-panel,.ela-page:has(#DarkMode .bi-sun-fill) #checkboxes-container,.ela-page:has(#DarkMode .bi-sun-fill) .form-select { background: var(--ela-elevated); color: var(--ela-text); }
 .ela-page:has(#DarkMode .bi-sun-fill) .form-select,.ela-page:has(#DarkMode .bi-sun-fill) #checkboxes-container { border-color: var(--ela-border) !important; }.ela-page:has(#DarkMode .bi-sun-fill) .CMH th,.ela-page:has(#DarkMode .bi-sun-fill) .conmat tr th:first-child { background: #272d38; }
+
+
+
 @media (max-width: 768px) { .ela-page header { padding: .8rem 1.25rem; }.ela-page main { padding: 2.5rem 1rem 1rem; }.ela-workflow { grid-template-columns: repeat(3,1fr); }.ela-config-grid { grid-template-columns: 1fr; }.ela-export-section { align-items: flex-start; flex-direction: column; } }
 @media (max-width: 480px) { .ela-workflow { grid-template-columns: repeat(2,1fr); }.ela-page .MLE1 { grid-template-columns: auto 1fr; padding: 1rem; }.upload-action { grid-column: 2; justify-self: start; }.ela-split-labels { align-items: flex-start; flex-direction: column; gap: .4rem; }.ela-page .conmat { overflow-x: auto; }.ela-page .conmat table { min-width: 420px; } }
 @media (prefers-reduced-motion: reduce) { .ela-page *,.ela-page *::before,.ela-page *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }

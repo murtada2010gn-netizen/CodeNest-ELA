@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="style.css">
 </head>
-    
+
 <body class="ela-page">
     <header>
         <h1 class="HT1"><b class="ela-mark" aria-hidden="true"><em></em><em></em><em></em></b>CodeNest <span>ELA</span><small>ML Experiment Studio</small></h1>
@@ -35,6 +35,7 @@
         </div>
         </nav>
     </header>
+
     <main class="ela-lab">
         <section class="ela-hero">
             <p class="ela-eyebrow">ELA / MACHINE LEARNING STUDIO</p>
@@ -53,6 +54,7 @@
                 <div class="hero-status-card"><span>Model</span><strong>Waiting for configuration</strong></div>
             </div>
         </section>
+
         <ol class="ela-workflow" aria-label="Experiment workflow">
             <li class="is-active"><span>01</span> Dataset</li>
             <li><span>02</span> Features</li>
@@ -61,22 +63,26 @@
             <li><span>05</span> Evaluate</li>
             <li><span>06</span> Export</li>
         </ol>
+
         <section class="ela-section ela-upload-section">
             <div class="ela-section-heading">
                 <span class="ela-step">01</span>
                 <div><p>Dataset</p><h2>Upload your CSV dataset</h2></div>
             </div>
-        <input accept=".csv" id="MBE1" type="file" style="display: none;">
-        <label class="MLE1" for="MBE1">
-            <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
-            <span class="upload-copy">
-                <strong>Drop your CSV here or choose a file</strong>
-                <small>CSV files only · Column headers will be used to configure your experiment.</small>
-            </span>
-            <span class="upload-action">Choose CSV</span>
-        </label>
-        <h4 class="MTE3" aria-live="polite">No dataset selected</h4>
-        <p class="ela-upload-note">CSV · Tabular ML · Your data stays part of this experiment</p>
+
+            <input accept=".csv" id="MBE1" type="file" style="display: none;">
+
+            <label class="MLE1" for="MBE1">
+                <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
+                <span class="upload-copy">
+                    <strong>Drop your CSV here or choose a file</strong>
+                    <small>CSV files only · Column headers will be used to configure your experiment.</small>
+                </span>
+                <span class="upload-action">Choose CSV</span>
+            </label>
+
+            <h4 class="MTE3" aria-live="polite">No dataset selected</h4>
+            <p class="ela-upload-note">CSV · Tabular ML · Your data stays part of this experiment</p>
         </section>
 
         <!-- الواجهة الجديدة لاختيار التارجت والفيشرز باستخدام Checkboxes -->
@@ -85,10 +91,12 @@
                 <span class="ela-step">02</span>
                 <div><p>Experiment configuration</p><h2>Choose what your model should learn</h2></div>
             </div>
+
             <div class="ela-config-grid">
             <div class="mb-4 ela-control-panel">
                 <label for="targetSelect" class="form-label h4 fw-bold">Target variable</label>
                 <p class="ela-field-help">The value your model learns to predict.</p>
+
                 <select id="targetSelect" class="form-select form-select-lg">
                     <option selected disabled>Choose Target...</option>
                 </select>
@@ -97,60 +105,77 @@
             <div class="mb-4 ela-control-panel" id="features-box" style="display: none;">
                 <label class="form-label h4 fw-bold">Feature columns</label>
                 <p class="ela-field-help">The input columns used by the model.</p>
+
                 <div id="checkboxes-container" class="card p-3 shadow-sm" style="max-height: 250px; overflow-y: auto;">
-                    <!-- هنا سيتم توليد الـ Checkboxes للفيشرز -->
                 </div>
             </div>
             </div>
         </div>
 
         <hr>
+
         <div class="model ela-section" style="display: none;">
             <div class="ela-section-heading">
                 <span class="ela-step">03</span>
                 <div><p>Learning task</p><h2>Select your model type</h2></div>
             </div>
+
             <p class="ela-field-help">Regression predicts continuous values. Classification predicts categories.</p>
+
             <div class="ela-task-guidance" aria-hidden="true">
                 <div><span>Regression</span><small>Predict a continuous number</small></div>
                 <div><span>Classification</span><small>Predict a category or class</small></div>
             </div>
+
             <div class="ela-engine-diagram" aria-hidden="true"><span>Features</span><b></b><strong>Model engine</strong><b></b><span>Prediction</span></div>
+
             <select id="Modelselect" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
                 <option selected disabled>Open this select menu</option>
                 <option value="LinearRegression">regression</option>
                 <option value="LogisticRegression">classification</option>
             </select>
         </div>
+
         <div class="testtrainsplit ela-section" style="margin: 0 auto; max-width: 50rem; display: none;">
             <div class="ela-section-heading">
                 <span class="ela-step">04</span>
                 <div><p>Validation</p><h2>Configure the train/test split</h2></div>
             </div>
+
             <p class="ela-field-help">Test data is held back to measure how well your model generalizes.</p>
+
             <div class="ela-split-labels">
                 <span>Training data <strong id="trainnum">80</strong>%</span>
                 <span>Test data <strong id="testnum">20</strong>%</span>
             </div>
+
             <div class="ela-split-visual" aria-hidden="true"><span></span><b></b></div>
+
             <label for="slider" class="form-label">Test Split Ratio</label>
             <input type="range" class="form-range" id="slider" min="5" max="95" value="20" step="5">
         </div>
+
         <div id="resultsContainer" class="container mt-5 ela-results-section" style="display: none;">
             <div class="ela-section-heading">
                 <span class="ela-step">05</span>
                 <div><p>Experiment complete</p><h2>Your model is ready.</h2></div>
             </div>
-            <div class="ela-data-orbit ela-orbit-results" aria-hidden="true"><span class="orbit-core">MODEL</span><span class="orbit-node orbit-data">INPUTS</span><span class="orbit-node orbit-target">SCORE</span><span class="orbit-node orbit-result">OUTPUT</span></div>
+
+            <div class="ela-data-orbit ela-orbit-results" aria-hidden="true">
+                <span class="orbit-core">MODEL</span>
+                <span class="orbit-node orbit-data">INPUTS</span>
+                <span class="orbit-node orbit-target">SCORE</span>
+                <span class="orbit-node orbit-result">OUTPUT</span>
+            </div>
+
             <div class="row g-4 justify-content-center">
-                
+
                 <!-- Metric 1 Card -->
                 <div class="col-md-6 text-center">
                     <div class="card shadow-sm border-0 p-3 ela-metric-card ela-primary-metric">
                         <div class="card-body">
                             <h6 id="metric1Title" class="text-secondary mb-3">R² Score</h6>
-                            
-                            <!-- إضافة دائرة التقدم الأولى -->
+
                             <div id="circle1" class="circle-progress my-3">
                                 <div class="circle-progress-inner">
                                     <span id="r2Value" class="fw-bold">-</span>
@@ -167,8 +192,7 @@
                     <div class="card shadow-sm border-0 p-3 ela-metric-card">
                         <div class="card-body">
                             <h6 id="metric2Title" class="text-secondary mb-3">MAE</h6>
-                            
-                            <!-- إضافة دائرة التقدم الثانية -->
+
                             <div id="circle2" class="circle-progress my-3">
                                 <div class="circle-progress-inner">
                                     <span id="rmseValue" class="fw-bold">-</span>
@@ -182,19 +206,22 @@
 
             </div>
         </div>
+
         <div style="margin-top: 2.5rem; display: none;" class="conmat">
             <div class="ela-matrix-heading">
                 <p>Classification detail</p>
                 <h2>Where did the model make mistakes?</h2>
             </div>
+
             <table class="table table-bordered text-center">
                 <thead class="CMH">
                     <tr>
                         <th></th>
                         <th>Predicted Negative</th>
-                        <th>Predicted Positive</th>  
+                        <th>Predicted Positive</th>
                     </tr>
-                </thead>   
+                </thead>
+
                 <tbody>
                     <tr>
                         <th>Actual Negative</th>
@@ -209,22 +236,51 @@
                 </tbody>
             </table>
         </div>
+
         <div class="ela-export-section">
             <div>
                 <p>06 · Export</p>
                 <h2>Take your experiment with you.</h2>
                 <span>Download the complete ELA experiment report.</span>
-                <div class="ela-audit-note"><strong>AI Model Audit</strong><span>ELA reviews performance, configuration, and potential issues automatically.</span></div>
+
+                <div class="ela-audit-note">
+                    <strong>AI Model Audit</strong>
+                    <span>ELA reviews performance, configuration, and potential issues automatically.</span>
+                </div>
             </div>
-            <form action="/download_report">
-                <button type="submit" id="download_report" class="btn btn-primary mx-auto mt-3" style="display: none;">Download experiment report</button>
+
+            <form id="reportForm">
+                <button type="submit" id="download_report" class="btn btn-primary mx-auto mt-3" style="display: none;">
+                    Download experiment report
+                </button>
+            </form>
+        </div>
+
+        <div class="ela-export-section ela-download-section">
+            <div>
+                <p>07 · Download Model</p>
+                <h2>Use your trained model anywhere!</h2>
+                <span>Download the trained model file.</span>
+
+                <div class="ela-audit-note">
+                    <strong>AI Model Audit</strong>
+                    <span>ELA reviews performance, configuration, and potential issues automatically.</span>
+                </div>
+            </div>
+
+            <form id="modelForm">
+                <button type="submit" id="download_model_btn" class="btn btn-primary mx-auto mt-3" style="display: none;">
+                    Download model
+                </button>
             </form>
         </div>
     </main>
+
     <footer>
         <p class="FT1">© 2026 CodeNest. All rights reserved.</p>
     </footer>
 </body>
+
 <script>
 let filename = document.querySelector("#MBE1");
 let filenamedisplay = document.querySelector(".MTE3");
@@ -235,6 +291,7 @@ let selectionContainer = document.querySelector("#selection-container");
 let ModelDiv = document.querySelector(".model");
 
 let allColumns = [];
+
 let setting = {
     fe: [],
     ta: null,
@@ -243,28 +300,32 @@ let setting = {
 };
 
 let selectedFile = null;
+let taskId = null;
 
 filename.addEventListener("change", function(event){
     const file = event.target.files[0];
     selectedFile = file;
-    
+
     if (file){
         filenamedisplay.textContent = `File name: ${file.name}`;
     } else {
         filenamedisplay.textContent = "Not file name";
         return;
     }
-    
+
     let reader = new FileReader();
+
     reader.onload = () => {
         const text = reader.result;
         const rows = text.split("\n");
         const frow = rows[0].replace("\r", "");
+
         allColumns = frow.split(/[,;]/)
             .map(col => col.trim().replace(/^["']|["']$/g, ''))
             .filter(col => col !== "");
-        
+
         targetSelect.innerHTML = '<option selected disabled>Choose Target...</option>';
+
         allColumns.forEach(col => {
             let option = document.createElement("option");
             option.value = col;
@@ -275,6 +336,7 @@ filename.addEventListener("change", function(event){
         selectionContainer.style.display = "block";
         featuresBox.style.display = "none";
     };
+
     reader.readAsText(file);
 });
 
@@ -322,18 +384,21 @@ targetSelect.addEventListener("change", function() {
 
 function updateFeatures() {
     setting.fe = [];
+
     document.querySelectorAll(".feature-checkbox:checked").forEach(chk => {
         setting.fe.push(chk.value);
     });
 }
 
 let ModelSelect = document.querySelector("#Modelselect");
+
 ModelSelect.addEventListener("change", function(){
     if (ModelSelect.value === "LinearRegression"){
         setting.model = "rfr";
     } else {
         setting.model = "rfc";
     }
+
     document.querySelector(".testtrainsplit").style.display = "block";
     trainButton.style.display = "block";
 });
@@ -351,38 +416,50 @@ trainButton.onclick = function(){
     let formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("settings", JSON.stringify(setting));
-    
+
     fetch("/train", {
         method: "POST",
         body: formData
     })
     .then(response => response.json())
     .then(data => {
+
+        // حفظ معرف التجربة القادمة من Flask
+        taskId = data.task_id;
+
         document.querySelector("#resultsContainer").style.display = "block";
+
         if (data.r2 !== undefined) {
+
             // تحديث الدوائر للـ Regression
             updateCircle("#circle1", data.r2 * 100, "#198754");
-            updateCircle("#circle2", 100, "#ffc107"); // إعطاء دائرة MAE حلقة بلون ثابت
-            
+            updateCircle("#circle2", 100, "#ffc107");
+
             document.querySelector("#metric1Title").textContent = "R² Score";
             document.querySelector("#r2Value").textContent = data.r2.toFixed(4);
             document.querySelector("#metric1Desc").textContent = "Higher is better";
+
             document.querySelector("#metric2Title").textContent = "MAE";
             document.querySelector("#rmseValue").textContent = data.mae.toFixed(4);
+
             document.querySelector(".conmat").style.display = "none";
             document.querySelector("#metric2Desc").textContent = "Lower is better";
         }
+
         else if (data.accuracy !== undefined) {
+
             // تحديث الدوائر للـ Classification
             updateCircle("#circle1", data.accuracy * 100, "#198754");
             updateCircle("#circle2", data.f1 * 100, "#0d6efd");
-            
+
             document.querySelector("#metric1Title").textContent = "Accuracy";
             document.querySelector("#r2Value").textContent = (data.accuracy * 100).toFixed(1) + "%";
             document.querySelector("#metric1Desc").textContent = "Higher is better";
+
             document.querySelector("#metric2Title").textContent = "F1 Score";
             document.querySelector("#rmseValue").textContent = data.f1.toFixed(4);
             document.querySelector("#metric2Desc").textContent = "Higher is better";
+
             document.querySelector(".conmat").style.display = "block";
 
             if (data.confusion_matrix && data.confusion_matrix.length > 0) {
@@ -390,26 +467,52 @@ trainButton.onclick = function(){
                 let FP = data.confusion_matrix[0][1] !== undefined ? data.confusion_matrix[0][1] : 0;
                 let FN = data.confusion_matrix[1] ? data.confusion_matrix[1][0] : 0;
                 let TP = data.confusion_matrix[1] ? data.confusion_matrix[1][1] : 0;
-                
+
                 document.querySelector(".tn").textContent = TN;
                 document.querySelector(".fp").textContent = FP;
                 document.querySelector(".fn").textContent = FN;
                 document.querySelector(".tp").textContent = TP;
             }
         }
+
         document.querySelector("#download_report").style.display = "block";
+        document.querySelector("#download_model_btn").style.display = "block";
 
     });
 };
 
 
+// تحميل الـ Report باستخدام taskId
+document.querySelector("#reportForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    if (!taskId) {
+        return;
+    }
+
+    window.location.href = `/download_report/${taskId}`;
+});
+
+
+// تحميل الـ Model باستخدام taskId
+document.querySelector("#modelForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    if (!taskId) {
+        return;
+    }
+
+    window.location.href = `/download_model/${taskId}`;
+});
+
+
 function updateCircle(circleId, percentage, color = "#0d6efd") {
     let circle = document.querySelector(circleId);
     let degrees = Math.max(0, Math.min(360, (percentage / 100) * 360));
+
     circle.style.background = `conic-gradient(${color} ${degrees}deg, #e9ecef ${degrees}deg)`;
 }
 
-// تحريك السلايدر
 let slider = document.querySelector("#slider");
 const slidnum = document.querySelector("#trainnum");
 const testnum = document.querySelector("#testnum");
@@ -419,6 +522,7 @@ slider.oninput = function() {
     slidnum.textContent = 100 - this.value;
     setting.TTS = parseInt(this.value);
 };
+
 
 // Dark Mode Toggle
 let table = document.querySelector(".table");
@@ -434,11 +538,13 @@ Darkmode.addEventListener("click", function () {
     let headings = document.querySelectorAll("h1, h2, h3, h4, label, .form-label");
 
     if (icon.classList.contains("bi-moon-fill")) {
+
         // التحويل للوضع الداكن
         man.style.backgroundColor = "#121212";
+
         icon.classList.remove("bi-moon-fill");
         icon.classList.add("bi-sun-fill");
-        
+
         mt2.style.color = "white";
         mt1.style.color = "white";
         filenamedisplay.style.color = "white";
@@ -459,9 +565,12 @@ Darkmode.addEventListener("click", function () {
             table.style.setProperty("--bs-table-bg", "#1e1e1e");
             table.style.setProperty("--bs-table-color", "white");
         }
+
     } else {
+
         // التحويل للوضع الفاتح
         man.style.backgroundColor = "white";
+
         icon.classList.remove("bi-sun-fill");
         icon.classList.add("bi-moon-fill");
 
@@ -489,3 +598,4 @@ Darkmode.addEventListener("click", function () {
 });
 </script>
 </html>
+
