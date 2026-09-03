@@ -147,11 +147,11 @@ All underlying system architecture, data flow logic, and Machine Learning algori
 
 ## Current Version
 
-The current version of ELA is **v0.5**.
+The current version of ELA is **v0.7**.
 
 The first working version focuses on the core workflow:
 
-**Dataset → Target → Features → Model Type → Training → Evaluation & Report Generation**
+**Dataset → Target → Features → Model Type → Training → Evaluation & Report Generation &  download trained model**
 
 The project is intentionally being developed in stages so that new features can be added after the core training pipeline is stable.
 
