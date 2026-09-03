@@ -161,10 +161,7 @@ Future versions of ELA are planned to expand the project beyond the current trai
 
 Possible additions include:
 
-* Downloading the trained model for reuse in other projects
 * Providing clearer explanations of errors and model performance
-* Adding NLP-based analysis of datasets and training results
-* Using an 8B language model for more detailed explanations
 * Supporting additional machine learning algorithms
 * Providing more visualizations and model comparisons
 
