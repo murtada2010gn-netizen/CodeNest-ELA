@@ -2,7 +2,6 @@
 
 **A CodeNest Project**
 
-#### Video Demo: [https://youtu.be/lLtXW3cZu0U?si=UxWRM7EhqxCkLrSl](https://youtu.be/lLtXW3cZu0U?si=UxWRM7EhqxCkLrSl)
 
 #### Project Date: August 28, 2026
 
