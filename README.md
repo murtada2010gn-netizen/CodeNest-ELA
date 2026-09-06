@@ -165,7 +165,7 @@ Possible additions include:
 * Supporting additional machine learning algorithms
 * Providing more visualizations and model comparisons
 
-These features are part of the future direction of the project and are separate from the functionality implemented in the current v0.5 release.
+These features are part of the future direction of the project and are separate from the functionality implemented in the current v0.7 release.
 
 ## Why I Built ELA
 
